@@ -58,7 +58,7 @@ class Worker(QThread):
             # 发射信号
             self.sinOut.emit(file_str)
             # 线程休眠2秒
-            self.sleep(2)
+            self.sleep(1)
 
 
 if __name__ == '__main__':
