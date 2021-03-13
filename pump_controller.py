@@ -2,7 +2,7 @@ import serial
 import time
 import json
 import os
-import configure
+# import configure
 
 
 class Pump(object):

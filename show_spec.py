@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from drug_design_UI import Ui_ReactionMonitor
+from mag_stir import stir
 # from PIL import Image
 # import cv2
 import random
@@ -13,6 +14,7 @@ class show_photo(QMainWindow, Ui_ReactionMonitor, QThread):
     def __init__(self, parent=None):
         super(show_photo, self).__init__(parent)
         self.setupUi(self)
+        self.stirrer = stir("com4")
 
         # 改下急停按钮颜色，急停退出
         self.e_stop.setStyleSheet("background-color: red")
@@ -86,10 +88,10 @@ class show_photo(QMainWindow, Ui_ReactionMonitor, QThread):
 
     # 更新采集到的状态
     def refresh_status(self, signal):
-        temp = str(random.uniform(21, 23))[:4]
+        temp = str(self.stirrer.read_status()[0] / 10)  # 读数返回第一个是温度
         flow = str(random.uniform(0.5, 0.7))[:4]
         pressure = str(random.uniform(0.150, 0.160))[:5]
-        stir = str(random.randint(445, 455))
+        stir = str(self.stirrer.read_status()[1])  # 读数返回第二个是转速
         PH = str(random.uniform(6.77, 6.99))[:4]
 
         self.temp_display.setText(temp + " C")
@@ -261,8 +263,8 @@ class status_update(QThread):
     def run(self):
         while 1:
             self.update_status.emit("1")  # 这个信号必须是string
-            # 线程休眠0.4秒，自动更新当前状态。
-            self.msleep(400)
+            # 线程休眠1秒，自动更新当前状态。
+            self.msleep(1000)
 
 
 if __name__ == "__main__":
