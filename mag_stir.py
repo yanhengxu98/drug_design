@@ -94,21 +94,28 @@ class stir(object):
             send_data = self.send_command(cmd)
             self.is_heating = 1
         else:
-            send_data = self.send_command(cmd) # 如果本来就开着，重设温度需要发送两次
+            send_data = self.send_command(cmd)  # 如果本来就开着，重设温度需要发送两次
             send_data = self.send_command(cmd)
-        return cmd
+        return send_data
 
     def heat_off(self):
         '''
-        首先判断加热器是否是开的状态，是的话
-        :return:
+        首先判断加热器是否是开的状态，是的话才发送关闭命令（温度设定为10度），否则直接return
+        :return: None
         '''
-
+        if self.is_heating == 0:
+            return 0
+        else:
+            cmd = bytes([0xfe, 0xb2, 0x00, 0x64, 0x00])
+            cmd += self.check_sum(cmd)
+            send_data = self.send_command(cmd)
+            self.is_heating = 0
+            return 1
 
 
 if __name__ == "__main__":
     stirrer = stir("com4")
     stirrer.read_status()
-    # stirrer.is_heating = 1
-    stirrer.set_temp_start(30.6)
+    stirrer.is_heating = 1
+    stirrer.heat_off()
 
