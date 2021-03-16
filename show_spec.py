@@ -14,7 +14,7 @@ class show_photo(QMainWindow, Ui_ReactionMonitor, QThread):
     def __init__(self, parent=None):
         super(show_photo, self).__init__(parent)
         self.setupUi(self)
-        self.stirrer = stir("com4")
+        self.stirrer = stir("com4") # 设置串口号
 
         # 改下急停按钮颜色，急停退出
         self.e_stop.setStyleSheet("background-color: red")
@@ -36,6 +36,18 @@ class show_photo(QMainWindow, Ui_ReactionMonitor, QThread):
         self.raman_spec.setPixmap(QPixmap("./img/" + self.raman_list[0]))
         self.raman_spec.setScaledContents(True)
 
+        # 初始按钮颜色，万一开的时候是在运转，则同步状态：
+        if self.stirrer.is_stirring == 1:
+            self.stir_switch.setText("Stir")
+            self.stir_switch.setStyleSheet("background-color: aqua")
+        if self.stirrer.is_heating == 1:
+            self.heat_switch.setText("HOT!")
+            self.heat_switch.setStyleSheet("background-color: orangered")
+
+        # 初始转速，温度的填充
+        self.set_temp.setValue(self.stirrer.temperature)
+        self.set_stir.setValue(self.stirrer.speed)
+
         # 按钮的连接
         self.ftir_get.clicked.connect(self.show_ir_clicked)
         self.raman_get.clicked.connect(self.show_raman_clicked)
@@ -50,6 +62,8 @@ class show_photo(QMainWindow, Ui_ReactionMonitor, QThread):
         self.switch8.clicked.connect(self.change_text8)
         self.switch9.clicked.connect(self.change_text9)
         self.switch10.clicked.connect(self.change_text10)
+        self.heat_switch.clicked.connect(self.set_temp_on_start)
+        self.stir_switch.clicked.connect(self.set_stir_on_start)
 
         # 图片自动刷新线程
         self.thread1 = backend_refresh()
@@ -99,6 +113,31 @@ class show_photo(QMainWindow, Ui_ReactionMonitor, QThread):
         self.pressure_display.setText(pressure + " MPA")
         self.Stir_display.setText(stir + " RPM")
         self.ph_display.setText(PH)
+
+    def set_temp_on_start(self, temp):
+        if self.stirrer.is_heating == 0:
+            self.heat_switch.setText("HOT!")
+            self.heat_switch.setStyleSheet("background-color: orangered")
+            self.stirrer.set_temp_start(self.set_temp.value())
+            # self.set_temp.setValue(self.stirrer.temperature)
+        else:
+            self.heat_switch.setText("OFF")
+            self.heat_switch.setStyleSheet("background-color: lightGrey")
+            self.stirrer.heat_off(self.set_temp.value())
+            # self.set_temp.setValue(self.stirrer.temperature)
+
+    def set_stir_on_start(self, speed):
+        if self.stirrer.is_stirring == 0:
+            self.stir_switch.setText("Stir")
+            self.stir_switch.setStyleSheet("background-color: aqua")
+            self.stirrer.set_stir_start(self.set_stir.value())
+            # self.set_stir.setValue(self.stirrer.speed)
+        else:
+            self.stir_switch.setText("OFF")
+            self.stir_switch.setStyleSheet("background-color: lightGrey")
+            self.stirrer.stir_off(self.set_stir.value())
+            # self.set_stir.setValue(self.stirrer.speed)
+
 
     # 十个开关变色变字土味实现
     def change_text1(self):
@@ -202,6 +241,8 @@ class show_photo(QMainWindow, Ui_ReactionMonitor, QThread):
             self.switch_buffer[9] = 0
 
     def e_quit(self):
+        self.stirrer.heat_off(self.stirrer.temperature)
+        self.stirrer.stir_off(self.stirrer.speed)
         os._exit(0)
 
     def closeEvent(self, event):
@@ -214,6 +255,8 @@ class show_photo(QMainWindow, Ui_ReactionMonitor, QThread):
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
+            self.stirrer.heat_off(10)
+            self.stirrer.stir_off(300)
             os._exit(0)
         else:
             event.ignore()

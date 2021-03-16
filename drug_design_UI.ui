@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1760</width>
-    <height>821</height>
+    <height>833</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -202,9 +202,9 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>100</y>
-      <width>81</width>
+      <x>60</x>
+      <y>80</y>
+      <width>131</width>
       <height>31</height>
      </rect>
     </property>
@@ -215,14 +215,14 @@
      </font>
     </property>
     <property name="text">
-     <string>Temp.</string>
+     <string>Current Temp.</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>160</y>
+      <x>60</x>
+      <y>240</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -240,8 +240,8 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>220</y>
+      <x>60</x>
+      <y>290</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -259,8 +259,8 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>280</y>
+      <x>60</x>
+      <y>160</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -272,13 +272,13 @@
      </font>
     </property>
     <property name="text">
-     <string>Stirring Speed</string>
+     <string>Current Stir</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>60</x>
       <y>340</y>
       <width>91</width>
       <height>31</height>
@@ -700,8 +700,8 @@
    <widget class="QLabel" name="temp_display">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>100</y>
+      <x>240</x>
+      <y>80</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -719,8 +719,8 @@
    <widget class="QLabel" name="flow_display">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>160</y>
+      <x>230</x>
+      <y>240</y>
       <width>111</width>
       <height>31</height>
      </rect>
@@ -738,8 +738,8 @@
    <widget class="QLabel" name="pressure_display">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>220</y>
+      <x>230</x>
+      <y>290</y>
       <width>101</width>
       <height>31</height>
      </rect>
@@ -757,8 +757,8 @@
    <widget class="QLabel" name="Stir_display">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>280</y>
+      <x>230</x>
+      <y>160</y>
       <width>101</width>
       <height>31</height>
      </rect>
@@ -795,7 +795,7 @@
    <widget class="QLabel" name="ph_display">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>230</x>
       <y>340</y>
       <width>101</width>
       <height>31</height>
@@ -831,6 +831,108 @@
     </property>
     <property name="text">
      <string>E-Stop</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>110</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Set Temp</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="set_temp">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>110</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <double>340.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>5.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_11">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>190</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Set Stir</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="set_stir">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>190</y>
+      <width>81</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <double>3000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>50.000000000000000</double>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="heat_switch">
+    <property name="geometry">
+     <rect>
+      <x>289</x>
+      <y>111</y>
+      <width>51</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OFF</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="stir_switch">
+    <property name="geometry">
+     <rect>
+      <x>289</x>
+      <y>192</y>
+      <width>51</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>OFF</string>
     </property>
    </widget>
   </widget>

@@ -14,8 +14,19 @@ class stir(object):
         # 标志位，标志加热状态
         self.is_heating = 0
         self.is_stirring = 0
+        self.setup()
+        self.speed = self.read_status()[3]  # 速度是真实速度
+        self.temperature = self.read_status()[2] / 10 # 温度是正常的十倍
 
         self.send_command(bytes([0xFE, 0xA0, 0x00, 0x00, 0x00, 0xA0]))
+
+    def setup(self):
+        # 初始化的时候，预先读取一下当前设备信息
+        cmd = bytes([0xfe, 0xa1, 0x00, 0x00, 0x00, 0xa1])  # 读取仪器状态，包含校验和
+        receive_data = self.send_command(cmd)
+
+        self.is_stirring = not receive_data[3]
+        self.is_heating = not receive_data[4]
 
     def check_port(self, port):
         if not port:
@@ -62,7 +73,7 @@ class stir(object):
             self.ser.read_all()
             print(cmd)
             print(e)
-            return -1
+            return b'\xfd\xa2\x01,\x00\x03\x01\xf4\x01\xb5}'
 
     def read_status(self):
         cmd = bytes([0xFE, 0xA2, 0x00, 0x00, 0x00])
@@ -75,15 +86,15 @@ class stir(object):
         set_temp = int.from_bytes(receive_data[6:8], 'big') # 第7，第8字节：设定温度值，是显示温度10倍
         real_temp = int.from_bytes(receive_data[8:10], 'big')   # 第9，第10字节：设定温度值，是显示温度10倍
 
-
         print(set_stir)
         print(real_stir)
         print(set_temp)
         print(real_temp)
 
-        return real_temp, real_stir
+        return real_temp, real_stir, set_temp, set_stir
 
     def set_temp_start(self, temp):
+        self.temperature = temp
         byte_temp = int(temp * 10).to_bytes(2, 'big')
         # 可重构
         cmd = bytes([0xFE, 0xB2])
@@ -98,24 +109,67 @@ class stir(object):
             send_data = self.send_command(cmd)
         return send_data
 
-    def heat_off(self):
+    def heat_off(self, temp):
         '''
-        首先判断加热器是否是开的状态，是的话才发送关闭命令（温度设定为10度），否则直接return
+        首先判断加热器是否是开的状态，是的话才发送关闭命令（设定的温度不会变），否则直接return
         :return: None
         '''
         if self.is_heating == 0:
             return 0
         else:
-            cmd = bytes([0xfe, 0xb2, 0x00, 0x64, 0x00])
+            self.temperature = temp
+            byte_temp = int(temp * 10).to_bytes(2, 'big')
+            cmd = bytes([0xFE, 0xB2])
+            cmd += byte_temp
+            cmd += bytes([0x00])
             cmd += self.check_sum(cmd)
             send_data = self.send_command(cmd)
             self.is_heating = 0
-            return 1
+            return send_data
+
+    def set_stir_start(self, speed):
+        '''
+        按照通讯协议组装改转速代码，发送出去
+        :param speed: 期望转速
+        :return: 发送的命令x16编码
+        '''
+        self.speed = speed
+        byte_speed = int(speed).to_bytes(2, 'big')
+        cmd = bytes([0xFE, 0xB1])
+        cmd += byte_speed
+        cmd += bytes([0x00])
+        cmd += self.check_sum(cmd)
+        if self.is_stirring == 0:
+            send_data = self.send_command(cmd)
+            self.is_stirring = 1
+        else:
+            send_data = self.send_command(cmd)
+            send_data = self.send_command(cmd)
+        return send_data
+
+    def stir_off(self, speed):
+        '''
+        首先判断搅拌器是否是开的状态，是的话才发送关闭命令（设定的转速不会变），否则直接return
+        :return: None
+        '''
+        if self.is_stirring == 0:
+            return 0
+        else:
+            self.speed = speed
+            byte_speed = int(speed).to_bytes(2, 'big')
+            cmd = bytes([0xFE, 0xB1])
+            cmd += byte_speed
+            cmd += bytes([0x00])
+            cmd += self.check_sum(cmd)
+            send_data = self.send_command(cmd)
+            self.is_stirring = 0
+            return send_data
 
 
 if __name__ == "__main__":
     stirrer = stir("com4")
     stirrer.read_status()
-    stirrer.is_heating = 1
-    stirrer.heat_off()
+    stirrer.set_temp_start(40)
+    time.sleep(10)
+    stirrer.heat_off(10)
 
